@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚖️ Law Firm Management System
 
-## Getting Started
+A modern full-stack web application that helps law firms manage cases, members, and internal operations with ease and security.
 
-First, run the development server:
+🌐 **Live Website**: https://lawnxt-web.vercel.app/
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<img width="1439" alt="LawNXT" src="https://github.com/user-attachments/assets/5e3da00a-b86f-46bb-953c-da2291e5d823" />
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧪 Demo Login
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Use the credentials below to explore the dashboard instantly:
 
-## Learn More
+-  📧 Email: demo@lawnxt.com
+- 🔐 Password: test@lawnxt
 
-To learn more about Next.js, take a look at the following resources:
+> You can also register your own firm to experience the full onboarding and role-based system end-to-end!
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Firm Registration & Subscription Plans**
+  - Owners can register their firm and select from available plans:
+    - **7-day Trial Plan**
+    - **Paid Plans** (e.g., Gold, Diamond, Platinum)
+- **Role-Based Access Control**
+  - Firm owners can add members and assign roles: `Admin`, `Editor`, or `Viewer`
+  - Fine-grained permission control based on roles
+- **Invite-Based Member Onboarding**
+  - Members can join firms using a unique invite code
+  - Owner must approve the membership request
+- **Dashboard Insights**
+  - View total number of cases
+  - View number of today’s and tomorrow’s cases
+  - Analytics of cases
+- **Secure Auth & State Management**
+  - Auth and database powered by **Appwrite**
+  - Global state handled using **Zustand**
 
-## Deploy on Vercel
+## 🧱 Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Frontend**: Next.js (App Router) with TypeScript
+- **Auth & Database**: Appwrite
+- **State Management**: Zustand
+- **Styling**: Tailwind CSS
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ✨ Future Enhancements
+- File uploads and document management
+- Notifications and reminders for upcoming cases
+- Integrating payment system
