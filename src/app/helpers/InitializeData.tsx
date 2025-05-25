@@ -21,10 +21,9 @@ const InitializeData = () => {
           const { firm, member } = await response.json();
 
           if (firm && member) {
-            const res = await fetch(`/api/firmMember?firmId=${firm.$id}&status=Approved`);
+            const res = await fetch(`/api/firmMember?firmId=${firm.$id}`);
     
             const membs = await res.json();
-            console.log("Initialized Members: ", membs)
             
             setCurrentFirm(firm);
             setUserRole(member?.role || null);
