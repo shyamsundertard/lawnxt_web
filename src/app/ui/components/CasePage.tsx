@@ -1,10 +1,9 @@
 "use client";
 import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
-import Button from "@/app/ui/forms/Button";
 import Input from "@/app/ui/forms/Input";
 import RadioButton from "../forms/RadioButton";
 import dayjs from "dayjs";
-import { ArrowLeft, CircleCheckBig, Download, Eye, Trash2 } from "lucide-react";
+import { ArrowLeft, CircleCheckBig, Download, Eye, Loader2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { fetchDocuments } from "@/app/lib/database";
 import { Query } from "appwrite";
@@ -14,6 +13,7 @@ import Loader from "../Loader";
 import axiosInstance from "@/app/lib/axiosInstance";
 import { Case } from "@/app/types";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
 
 interface ApiResponse {
   message: string;
@@ -519,13 +519,17 @@ const CasePage = ({ caseId }: { caseId?: string }) => {
         />
         </div>
         <div className="flex border-t lg:border-none  items-center md:items-start md:justify-start justify-center fixed md:static bottom-0 left-0 w-full px-4 md:px-0 z-[99] bg-white h-[80px] md:h-auto gap-4 mt-4">
-        <Button type="submit" variant="contained" text={caseId ? "Update Case" : "Add Case"} state={isLoading ? "loading" : "enabled"} />
+        <Button type="submit" variant='default' disabled={isLoading ? true : false} >
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {isLoading ? (caseId ? "Updating..." : "Adding...") : (caseId ? "Update Case" : "Add Case")}
+        </Button>
         <Button
             type="reset"
             onClick={handleReset}
-            variant="outlined"
-            text="Reset"
-        />
+            variant='default'
+        >
+          Reset
+        </Button>
         </div>
     </form>
     {/* Preview */}

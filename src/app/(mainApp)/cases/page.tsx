@@ -1,6 +1,5 @@
 "use client";
 import CaseCard from "@/app/ui/CaseCard";
-import Button from "@/app/ui/forms/Button";
 import Input from "@/app/ui/forms/Input";
 import Select from "@/app/ui/forms/Select";
 import { useEffect, useMemo, useState } from "react";
@@ -10,6 +9,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useCaseStore, useFirmStore } from "@/store/useStore";
 import { Case } from "@/app/types";
+import { Button } from "@/components/ui/button";
 
 dayjs.extend(customParseFormat);
 
@@ -153,7 +153,9 @@ const Cases = () => {
         </div>
         <div className="mt-4">
           <div className="w-fit">
-            <Button text="Clear Filters" onClick={clearFilters} />
+            <Button onClick={clearFilters} >
+            Clear Filters
+            </Button>
           </div>
         </div>
       </div>

@@ -5,8 +5,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import dayjs from "dayjs";
 import { useFirmStore, useCaseStore, useUserStore } from "@/store/useStore";
 import CaseCard from "@/app/ui/CaseCard";
-import Button from "@/app/ui/forms/Button";
 import AnalyticsCard from "@/app/ui/AnalyticsCard";
+import { Button } from "@/components/ui/button";
 
 const colors = ["#8884d8", "#83a6ed", "#8dd1e1"];
 
@@ -114,11 +114,12 @@ const DashboardHomepage = () => {
         </div>
         <div className="block w-16 md:w-28">
           <Button
-            text="Add Case"
             onClick={handleAddCase}
-            variant="contained"
-            state={!subscriptionStatus?.active ? "disabled" : "enabled"}
-          />
+            variant='default'
+            disabled={!subscriptionStatus?.active ? true : false}
+          >
+            Add Case
+          </Button>
         </div>
       </header>
 
