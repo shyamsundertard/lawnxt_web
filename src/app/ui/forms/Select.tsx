@@ -8,6 +8,8 @@ interface SelectProps {
   errorMessage?: string;
   name?: string;
   label?: string;
+  value?: string;
+  disabled?: boolean
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -18,6 +20,8 @@ const Select: React.FC<SelectProps> = ({
   errorMessage,
   name,
   label,
+  value,
+  disabled = false,
 }) => {
   return (
     <div className="w-full">
@@ -32,19 +36,26 @@ const Select: React.FC<SelectProps> = ({
         </label>
       )}
       <select
-        onChange={
-          onChange
-        }
-        className={`w-full p-[9px] border rounded-md bg-white focus:border-black focus:outline-none text-black 
+        onChange={onChange}
+        value={value}
+        disabled={disabled}
+        className={`w-full p-[9px] border rounded-md 
+          ${disabled 
+            ? "bg-gray-300" 
+            : "bg-white"
+          } 
+          focus:border-black focus:outline-none text-black 
           ${
             isInvalid
               ? "border-red-500 focus:ring-red-500"
               : "border-gray-300 focus:ring-gray-500"
-          }`}
+          } cursor-pointer`}
       >
-        <option value="" className="bg-gray-200">
-          {placeholder}
-        </option>
+        {!value && (
+          <option value="" className="bg-gray-200">
+            {placeholder}
+          </option>
+        )}
         {options.map((option) => (
           <option
             className="bg-white text-black focus:bg-white cursor-pointer"
