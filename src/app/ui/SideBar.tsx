@@ -15,7 +15,7 @@ const Sidebar = () => {
   const router = useRouter();
   const { setIsAuthenticated } = useAuthStore();
   const { setCases } = useCaseStore();
-  const { clearFirmData } = useFirmStore();
+  const { clearFirmData, userRole } = useFirmStore();
   const { setUser } = useUserStore();
  
     const logoutUser = async () => {
@@ -32,12 +32,13 @@ const Sidebar = () => {
       router.push('./login');
   
     };
-  // const {user} = useUserStore();
 
   useEffect(() => {
     const path = pathname.split("/")[1];
     setActive(path);
   }, [pathname]);
+
+  const filteredLinks = userRole === 'Owner' || userRole === 'Admin' ? links : links.filter(link => link.label !== 'User Management')
 
   return (
     <aside className="lg:w-[250px] md:w-[220px] fixed md:block hidden top-0 left-0 h-full bg-white border-r shadow-md">
@@ -52,7 +53,7 @@ const Sidebar = () => {
           {/* Navigation Links */}
           <nav className="pt-8">
             <ul className="flex flex-col gap-2">
-              {links.map((link, i) => (
+              {filteredLinks.map((link, i) => (
                 <li key={i}>
                   <Link
                     href={link.path}

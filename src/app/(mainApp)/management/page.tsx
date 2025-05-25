@@ -17,14 +17,20 @@ export default function UsersManagement({}) {
   const [filter, setFilter] = useState<"All" | "Approved" | "Pending">("All");
   const router = useRouter();
 
+  if (userRole === 'Viewer' || userRole === 'Editor') {
+    router.back();
+  }
+
   const updateUser = (id: string, field: "role" | "status", value: string) => {
     setUsers((prev) =>
       prev.map((user) => (user.$id === id ? { ...user, [field]: value } : user))
     );
   };
 
+  const remUsers = users.filter(doc => {return doc.role !== "Owner"})
+
   const filteredUsers =
-    filter === "All" ? users : users.filter((user) => user.status === filter);
+    filter === "All" ? remUsers : remUsers.filter((user) => user.status === filter);
 
   return (
     <div className="md:pt-8 pt-4 bg-white text-black min-h-screen">
@@ -63,6 +69,7 @@ export default function UsersManagement({}) {
             onChange={(e) =>
               setFilter(e.target.value as "All" | "Approved" | "Pending")
             }
+            value={filter}
           />
         </div>
       </div>
@@ -105,7 +112,7 @@ export default function UsersManagement({}) {
                       onChange={(e) =>
                         updateUser(user.$id, "role", e.target.value)
                       }
-                      placeholder={user.role}
+                      value={user.role}
                     />
                   </div>
                 </td>
@@ -119,7 +126,7 @@ export default function UsersManagement({}) {
                       onChange={(e) =>
                         updateUser(user.$id, "status", e.target.value)
                       }
-                      placeholder={user.status}
+                      value={user.status}
                     />
                   </div>
                 </td>
