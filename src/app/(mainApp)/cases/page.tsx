@@ -3,12 +3,13 @@ import CaseCard from "@/app/ui/CaseCard";
 import Button from "@/app/ui/forms/Button";
 import Input from "@/app/ui/forms/Input";
 import Select from "@/app/ui/forms/Select";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useCaseStore } from "@/store/useStore";
+import { useCaseStore, useFirmStore } from "@/store/useStore";
+import { Case } from "@/app/types";
 
 dayjs.extend(customParseFormat);
 
@@ -24,8 +25,8 @@ const paymentStatus = [
 ];
 
 const Cases = () => {
-  const { cases } = useCaseStore();
-  // const [loading, setLoading] = useState(false);
+  const { cases, setCases } = useCaseStore();
+  const { currentFirm } = useFirmStore();
   const [filterData, setFilterData] = useState({
     clientName: "",
     status: "",
@@ -98,6 +99,18 @@ const Cases = () => {
     setPage(value);
   };
 
+  useEffect(() => {
+    const fetchCases = async () => {
+      const response = await fetch('/api/case');
+      const allCases = await response.json() as Case[];
+      const filteredCases = allCases.filter(doc => {
+        return doc.firmId === currentFirm?.$id;
+      });
+      setCases(filteredCases);
+    };
+    fetchCases();
+  }, [currentFirm?.$id, setCases]);
+
   return (
     <div className="md:pt-8 pt-4">
       <div>
@@ -163,7 +176,6 @@ const Cases = () => {
               />
             </div>
           ))}
-          {/* {!loading && paginatedCases.length === 0 && <p>No cases found.</p>} */}
           {paginatedCases.length === 0 && <p>No cases found.</p>}
         </div>
         <div className="mt-4">
