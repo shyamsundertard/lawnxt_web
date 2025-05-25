@@ -42,7 +42,7 @@ export default function JoinFirm() {
       const response = await fetch(`/api/firm/getFirmByInviteCode?inviteCode=${inviteCode}`);
       const firm = await response.json();
       
-      const role = 'viewer';
+      const role = 'Viewer';
       const status = 'Pending';
 
       await axiosInstance.post('/api/addFirmMember', {
