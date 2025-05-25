@@ -1,7 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell } from "recharts";
 import dayjs from "dayjs";
 import { useFirmStore, useCaseStore, useUserStore } from "@/store/useStore";
 import CaseCard from "@/app/ui/CaseCard";

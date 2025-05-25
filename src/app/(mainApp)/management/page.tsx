@@ -52,7 +52,7 @@ export default function UsersManagement({}) {
 
       const originalMap = new Map(originalUsers.map(u => [u.$id, u]));
 
-      const changes = users.filter((u,i) => {
+      const changes = users.filter((u) => {
         const original = originalMap.get(u.$id);
         return original && (u.role !== original.role || u.status !== original.status);
       });
