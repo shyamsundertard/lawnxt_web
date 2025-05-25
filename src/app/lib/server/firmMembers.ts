@@ -71,7 +71,7 @@ export const getUserAndFirm = async (userId: string): Promise<{firm: FirmType | 
   }
 
   const result = await FirmMember.findMany();
-
+  
   const filtered = result.documents.filter(doc => 
     doc.userId === userId
   );
@@ -82,7 +82,20 @@ export const getUserAndFirm = async (userId: string): Promise<{firm: FirmType | 
   }
 
   const member = filtered[0] as unknown as FirmMemberType;
-  const firm = await Firm.findOne(member.firmId);
   
-  return { firm: firm as unknown as FirmType ?? null, member: member ?? null};
+  try {
+    const firm = await Firm.findOne(member.firmId);
+    if (!firm) {
+      console.log("No firm found with ID:", member.firmId);
+      return { firm: null, member };
+    }
+    
+    return { 
+      firm: firm as unknown as FirmType, 
+      member 
+    };
+  } catch (error) {
+    console.error("Error fetching firm:", error);
+    return { firm: null, member };
+  }
 };
