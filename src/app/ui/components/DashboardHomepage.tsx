@@ -61,7 +61,7 @@ const DashboardHomepage = () => {
       },
       {
         label: "Total Members",
-        number: firmMembers.length,
+        number: firmMembers.filter(doc => { return doc.status === 'Approved'}).length,
       },
     ];
   }, [cases, todayCases, tomorrowCases, firmMembers]);
@@ -112,7 +112,7 @@ const DashboardHomepage = () => {
           </h1>
           <p className="text-gray-500">Here&apos;s what&apos;s happening today.</p>
         </div>
-        <div className="hidden md:block">
+        <div className="block w-16 md:w-28">
           <Button
             text="Add Case"
             onClick={handleAddCase}
