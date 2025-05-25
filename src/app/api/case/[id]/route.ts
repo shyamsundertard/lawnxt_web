@@ -5,14 +5,18 @@ const Case = baseModel(process.env.CASE_COLLECTION_ID as string);
 
 export async function GET(req: NextRequest, {params}: {params: {id: string}}) {
         const user = await Case.findOne(params.id);
-        return NextResponse.json(user);
+        return NextResponse.json(user.documents);
 }
 
 export async function PUT(req: NextRequest, {params}: {params: {id: string}}) {
     const data = await req.json();
 
-    const updated = await Case.update(params.id, data);
-    return NextResponse.json(updated);
+    await Case.update(params.id, data);
+    return NextResponse.json({
+        message: "Case updated successfully",
+    },{
+        status: 200
+    });
 }
 
 export async function DELETE(req: NextRequest, {params}: {params: {id: string}}) {

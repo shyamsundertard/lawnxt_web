@@ -11,7 +11,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
-    const created = await Case.create(body);
+    await Case.create(body);
 
-    return NextResponse.json(created);
+    return NextResponse.json({
+        message: "Case created successfully",
+    },{
+        status: 201
+    });
 }
