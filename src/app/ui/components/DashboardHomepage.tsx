@@ -190,26 +190,24 @@ const DashboardHomepage = () => {
           <div className="flex flex-col md:flex-row gap-6 mt-4">
             <div className="bg-gray-100 p-2 rounded-md">
               {pieChartData.length > 0 ? (
-                <ResponsiveContainer width={400} height={300}>
-                  <PieChart>
-                    <Pie
-                      data={pieChartData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {pieChartData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={colors[index % colors.length]}
-                        />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+                <PieChart width={400} height={300}>
+                  <Pie
+                    data={pieChartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {pieChartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={colors[index % colors.length]}
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
               ) : (
                 <div className="flex justify-center items-center h-[300px] w-[400px]">
                   <p className="text-gray-400">No Data</p>
