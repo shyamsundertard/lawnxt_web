@@ -19,8 +19,7 @@ export async function GET() {
     const { firm, member } = await getUserAndFirm(user.$id);
 
     return NextResponse.json({ firm, member });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch firm membership' },
       { status: 500 }

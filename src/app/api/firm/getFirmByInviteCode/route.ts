@@ -12,8 +12,7 @@ export async function GET(request:Request) {
     try {
         const data = await getFirmByInviteCode(inviteCode);
         return NextResponse.json(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Failed to fetch user and firm" }, { status: 500 });
     }
 }

@@ -6,8 +6,7 @@ export async function GET() {
         await account.getSession("current");
 
         return NextResponse.json({ authenticated: true });
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
         return NextResponse.json({ authenticated: false });
     }
 }
