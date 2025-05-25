@@ -195,15 +195,14 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
       const responseData = response.data as SubscriptionPlan[];
       const plans: SubscriptionPlan[] = responseData.map((plan) => ({
         $id: plan.$id,
-        name: plan.name,
-        caseLimit: plan.name === 'Platinum' ? 'Unlimited' : plan.caseLimit,
-        memberLimit: plan.name === 'Platinum' ? 'Unlimited' : plan.memberLimit,
+        planName: plan.planName,
+        caseLimit: plan.planName === 'Platinum' ? 'Unlimited' : plan.caseLimit,
+        memberLimit: plan.planName === 'Platinum' ? 'Unlimited' : plan.memberLimit,
         monthlyPrice: plan.monthlyPrice,
         yearlyPrice: plan.yearlyPrice,
         isActive: plan.isActive,
-        trialDays: plan.name === 'Trial' ? "7" : undefined
+        trialDays: plan.planName === 'Trial' ? "7" : undefined
       }));
-      console.log("Plans: ", plans)
       set({ plans, isLoading: false });
     } catch (error) {
       set({ 

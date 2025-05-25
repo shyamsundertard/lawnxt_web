@@ -69,7 +69,7 @@ export interface SubscriptionStatus {
 
 export interface SubscriptionPlan {
   $id: string;
-  name: string;
+  planName: string;
   caseLimit: string | 'Unlimited';
   memberLimit: string | 'Unlimited';
   monthlyPrice: string;
