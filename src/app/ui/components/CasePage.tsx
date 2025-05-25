@@ -4,14 +4,20 @@ import Button from "@/app/ui/forms/Button";
 import Input from "@/app/ui/forms/Input";
 import RadioButton from "../forms/RadioButton";
 import dayjs from "dayjs";
-import { ArrowLeft, Download, Eye, Trash2 } from "lucide-react";
+import { ArrowLeft, CircleCheckBig, Download, Eye, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { fetchDocuments } from "@/app/lib/database";
 import { Query } from "appwrite";
-import { useCaseStore } from "@/store/useStore";
+import { useCaseStore, useFirmStore } from "@/store/useStore";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import Loader from "../Loader";
 import axiosInstance from "@/app/lib/axiosInstance";
+import { Case } from "@/app/types";
+import toast from "react-hot-toast";
+
+interface ApiResponse {
+  message: string;
+}
 
 dayjs.extend(customParseFormat);
 
@@ -37,6 +43,7 @@ const getExtensionColor = (extension: string) => {
 const CasePage = ({ caseId }: { caseId?: string }) => {
 
   const router = useRouter();
+  const { currentFirm } = useFirmStore();
 
   const [formData, setFormData] = useState({
     caseTitle: "",
@@ -52,7 +59,7 @@ const CasePage = ({ caseId }: { caseId?: string }) => {
     courtNumberAndJudge: "",
     courtType: "",
     acts: "",
-    firmId: "",
+    firmId: currentFirm?.$id,
     paymentStatus: false,
     clientPhoneNumber: "",
     filingDate: "",
@@ -67,6 +74,7 @@ const CasePage = ({ caseId }: { caseId?: string }) => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { cases } = useCaseStore();
   const [driveLoading, setDriveLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -139,14 +147,35 @@ const CasePage = ({ caseId }: { caseId?: string }) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateForm()) {
-      await axiosInstance.post('/api/case',formData)
+      setIsLoading(true);
+      let response;
+      if (caseId) {
+        response = await axiosInstance.put<ApiResponse>(`/api/case/${caseId}`,formData)
+      }
+      else {
+        response = await axiosInstance.post<ApiResponse>('/api/case',formData)
+      }
+      if (response.status === 201) {
+        toast.success(response.data.message, {
+          icon: <CircleCheckBig/> 
+        });
+      } else if (response.status === 200) {
+        toast.success(response.data.message, {
+          icon: <CircleCheckBig/> 
+        });
+      }
+       else {
+        toast.error(response.data.message);
+      }
+      setIsLoading(false);
+      router.push("/cases");
     }
   };
 
   const fetchCase = () => {
     if (caseId) {
       const caseData =
-        cases.length > 0 ? cases.find((c) => c.$id === caseId) : null;
+        cases.length > 0 ? cases.find((c: Case) => c.$id === caseId) : null;
       if (caseData) {
         setFormData({
             caseTitle: caseData.caseTitle,
@@ -490,7 +519,7 @@ const CasePage = ({ caseId }: { caseId?: string }) => {
         />
         </div>
         <div className="flex border-t lg:border-none  items-center md:items-start md:justify-start justify-center fixed md:static bottom-0 left-0 w-full px-4 md:px-0 z-[99] bg-white h-[80px] md:h-auto gap-4 mt-4">
-        <Button type="submit" variant="contained" text="Add Case" />
+        <Button type="submit" variant="contained" text={caseId ? "Update Case" : "Add Case"} state={isLoading ? "loading" : "enabled"} />
         <Button
             type="reset"
             onClick={handleReset}
@@ -512,16 +541,10 @@ const CasePage = ({ caseId }: { caseId?: string }) => {
         <span className=" line-clamp-3">
             Case Title: {formData.caseTitle}
         </span>
-        {/* <span className=" line-clamp-3">
-            Client Name: {formData.clientName}
-        </span> */}
         <span className=" line-clamp-3">Phone: {formData.clientPhoneNumber}</span>
         <span className=" line-clamp-3">
             CNR Number: {formData.cnrNumber}
         </span>
-        {/* <span className=" line-clamp-3">
-            Court Name: {formData.courtName}
-        </span> */}
         <span className=" line-clamp-3">
             Undersection: {formData.acts}
         </span>
