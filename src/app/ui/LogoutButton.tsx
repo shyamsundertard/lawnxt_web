@@ -1,26 +1,25 @@
-import { account } from '../lib/client/appwrite'
-import { LogOut } from 'lucide-react'
+import { signOut } from 'firebase/auth';
+import { auth } from '@/app/lib/firebase';
+import { LogOut } from 'lucide-react';
 import { useAuthStore, useCaseStore, useFirmStore, useUserStore } from '@/store/useStore';
 
 export default function LogoutButton() {
-
   const { setIsAuthenticated } = useAuthStore();
   const { setCases } = useCaseStore();
   const { clearFirmData } = useFirmStore();
   const { setUser } = useUserStore();
   
   async function logout() {
-    
-    await account.deleteSession("current")
-    setCases([]);
-    clearFirmData();
-    setUser(null);
-
-    document.cookie = 'current_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict';
-
-    setIsAuthenticated(false);
-
-    window.location.href = '/';
+    try {
+      await signOut(auth);
+      setCases([]);
+      clearFirmData();
+      setUser(null);
+      setIsAuthenticated(false);
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   }
 
   return (
@@ -33,5 +32,5 @@ export default function LogoutButton() {
         <span>Logout</span>
       </button>
     </form>
-  )
+  );
 }

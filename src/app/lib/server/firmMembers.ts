@@ -40,13 +40,13 @@ export const approveFirmMember = async (memberId: string): Promise<FirmMemberTyp
 
 export const getFirmMembers = async (firmId: string, status?: "Pending" | "Approved"): Promise<FirmMemberType[]> => {
   const result = await FirmMember.findMany();
-  const filtered = result.documents.filter(doc => {
+  const filtered = (result as unknown as FirmMemberType[]).filter(doc => {
     if (doc.firmId !== firmId) return false;
     if (status && doc.status !== status) return false;
     return true;
   });
   
-  return filtered as unknown as FirmMemberType[];
+  return filtered;
 };
 
 export const getUserAndFirm = async (userId: string): Promise<{firm: FirmType | null, member: FirmMemberType | null}> => {
@@ -72,7 +72,7 @@ export const getUserAndFirm = async (userId: string): Promise<{firm: FirmType | 
 
   const result = await FirmMember.findMany();
   
-  const filtered = result.documents.filter(doc => 
+  const filtered = (result as unknown as FirmMemberType[]).filter(doc => 
     doc.userId === userId
   );
 

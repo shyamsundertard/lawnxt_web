@@ -4,17 +4,21 @@ import Input from "@/app/ui/forms/Input";
 import Button from "@/app/ui/forms/Button";
 import { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
-import { AppwriteException } from "appwrite";
-import { account } from "@/app/lib/client/appwrite";
-import {useAuthStore } from "@/store/useStore";
+import { FirebaseError } from "firebase/app";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/app/lib/firebase";
+import { useAuthStore, useUserStore } from "@/store/useStore";
 import Link from "next/link";
 import { CircleCheckBig, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 interface FormDataTypes {
   email: string;
   password: string;
 }
 
 const Login = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState<FormDataTypes>({
     email: "",
     password: "",
@@ -22,6 +26,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { setIsAuthenticated } = useAuthStore();
+  const { setUser } = useUserStore();
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -41,31 +46,67 @@ const Login = () => {
     }
     try {
       setLoading(true);
-      const session = await account.createEmailPasswordSession(
-      formData.email,
-      formData.password
+      
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
       );
 
+      // Get the ID token
+      const idToken = await userCredential.user.getIdToken();
 
-      document.cookie = `a_session_${process.env.NEXT_PUBLIC_PROJECT_ID}=${session.secret}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=lax`;
-
-      document.cookie = `current_session=${session.userId}; path=/; secure; samesite=strict; max-age=${60 * 60 * 24 * 7}`;
-
-      await account.get();
-
+      // Set user data
+      setUser({
+        $id: userCredential.user.uid,
+        name: userCredential.user.displayName || '',
+        email: userCredential.user.email || '',
+      });
+      
+      // Set the session cookie
+      document.cookie = `current_session=${userCredential.user.uid}; path=/; secure; samesite=strict`;
+      
       setIsAuthenticated(true);
-
-      window.location.href = '/';
+      setFormData({ email: "", password: "" });
+      
       toast.success("Login successful", {
         icon: <CircleCheckBig/>
       });
-      setFormData({ email: "", password: "" });
-      return session;
-    } catch (error) {
-      if (error instanceof AppwriteException) {
-        toast.error(error.message, {
-          icon: <X/>
-        });
+
+      // Use Next.js router for navigation
+      router.push('/');
+      router.refresh(); // Refresh the page to update server components
+    } catch (error: unknown) {
+      console.error("Firebase Auth Error:", error);
+      
+      if (error instanceof FirebaseError) {
+        // Handle specific Firebase Auth error codes
+        switch (error.code) {
+          case 'auth/invalid-email':
+            toast.error("Invalid email address", {
+              icon: <X/>
+            });
+            break;
+          case 'auth/user-disabled':
+            toast.error("This account has been disabled", {
+              icon: <X/>
+            });
+            break;
+          case 'auth/user-not-found':
+            toast.error("No account found with this email", {
+              icon: <X/>
+            });
+            break;
+          case 'auth/wrong-password':
+            toast.error("Incorrect password", {
+              icon: <X/>
+            });
+            break;
+          default:
+            toast.error(error.message, {
+              icon: <X/>
+            });
+        }
       } else {
         toast.error("Something went wrong", {
           icon: <X/>

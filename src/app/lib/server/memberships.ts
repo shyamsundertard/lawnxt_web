@@ -7,6 +7,5 @@ const Membership = baseModel(process.env.MEMBERSHIP_COLLECTION_ID!);
 
 export const getPlans = async () => {
     const result = await Membership.findMany();
-    
-    return result.documents as unknown as Membership[];
+    return result as unknown as Membership[];
 }

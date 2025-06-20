@@ -1,6 +1,5 @@
 import { baseModel } from '@/app/lib/server/baseModel';
-import { cookies } from 'next/headers';
-import { serverAccount } from '@/app/lib/server/node-appwrite';
+import { getAuth } from 'firebase-admin/auth';
 import { NextResponse } from 'next/server';
 
 const Firm = baseModel(process.env.FIRM_COLLECTION_ID!);
@@ -18,24 +17,24 @@ export async function GET(request: Request) {
       );
     }
 
-    const cookieStore = cookies();
-    const session = cookieStore.get('a_session')?.value;
+    const authHeader = request.headers.get('authorization');
+    const token = authHeader?.split('Bearer ')[1];
 
-    if (!session) {
+    if (!token) {
       return Response.json(
         { error: 'Unauthorised'},
         { status: 401 }
       );
     }
 
-    const user = await serverAccount.get();
+    const decodedToken = await getAuth().verifyIdToken(token);
+    const userId = decodedToken.uid;
 
     const result = await Firm.findMany();
-
-    const firmRes = result.documents.filter(doc => 
+    const firmRes = (result as any[]).filter(doc => 
         doc.$id === firmId &&
-        doc.ownerId === user.$id
-    )
+        doc.ownerId === userId
+    );
 
     if (firmRes.length > 0) {
         return NextResponse.json({
@@ -45,9 +44,9 @@ export async function GET(request: Request) {
     }
 
     const memberRes = await FirmMember.findMany();
-    const filtered = memberRes.documents.filter(doc => 
+    const filtered = (memberRes as any[]).filter(doc => 
         doc.firmId === firmId &&
-        doc.userId === user.$id &&
+        doc.userId === userId &&
         doc.status === 'Approved'
     );
 

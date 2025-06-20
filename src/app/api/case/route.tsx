@@ -5,8 +5,7 @@ const Case = baseModel(process.env.CASE_COLLECTION_ID as string);
 
 export async function GET() {
     const cases = await Case.findMany();
-
-    return NextResponse.json(cases.documents);
+    return NextResponse.json(cases);
 }
 
 export async function POST(req: NextRequest) {

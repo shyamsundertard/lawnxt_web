@@ -1,27 +1,21 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { Client, Account } from 'node-appwrite';
+import { getAuth } from 'firebase-admin/auth';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const cookieStore = cookies();
-    const sessionCookie = cookieStore.get(`a_session_${process.env.NEXT_PUBLIC_PROJECT_ID!}`);
+    const authHeader = request.headers.get('authorization');
+    const token = authHeader?.split('Bearer ')[1];
     
-    if (!sessionCookie) {
+    if (!token) {
       return NextResponse.json({ isAuthenticated: false }, { status: 401 });
     }
 
-    // Initialize Appwrite client
-    const client = new Client()
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT!)
-      .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!)
-      .setKey(process.env.APPWRITE_API_KEY!);
-
-    // Use the session cookie as JWT
-    client.setJWT(sessionCookie.value);
-
-    const account = new Account(client);
-    const user = await account.get();
+    const decodedToken = await getAuth().verifyIdToken(token);
+    const user = {
+      $id: decodedToken.uid,
+      email: decodedToken.email,
+      name: decodedToken.name,
+    };
 
     return NextResponse.json({ 
       isAuthenticated: true, 

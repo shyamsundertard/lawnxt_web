@@ -6,7 +6,7 @@ import { ImHammer2 } from "react-icons/im";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import { account } from "../lib/client/appwrite";
+import { auth } from "../lib/firebase";
 import { useAuthStore, useCaseStore, useFirmStore, useUserStore } from "@/store/useStore";
 
 const Sidebar = () => {
@@ -20,7 +20,7 @@ const Sidebar = () => {
  
     const logoutUser = async () => {
   
-      await account.deleteSession("current");
+      await auth.signOut();
 
       setCases([]);
       clearFirmData();

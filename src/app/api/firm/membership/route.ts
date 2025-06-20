@@ -1,22 +1,21 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { serverAccount } from '@/app/lib/server/node-appwrite';
+import { getAuth } from 'firebase-admin/auth';
 import { getUserAndFirm } from '@/app/lib/server/firmMembers';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const cookieStore = cookies();
-    const session = cookieStore.get('a_session')?.value;
+    const authHeader = request.headers.get('authorization');
+    const token = authHeader?.split('Bearer ')[1];
 
-    if (!session) {
+    if (!token) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const user = await serverAccount.get();
-    const { firm, member } = await getUserAndFirm(user.$id);
+    const decodedToken = await getAuth().verifyIdToken(token);
+    const { firm, member } = await getUserAndFirm(decodedToken.uid);
 
     return NextResponse.json({ firm, member });
   } catch {

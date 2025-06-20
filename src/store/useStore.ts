@@ -135,11 +135,22 @@ const useFirmStore = create<FirmState>((set) => ({
           memberLimit: subStatus?.memberLimit || '0'
         }
 
+        console.log("SubStatus", subsStatus);
+
+        // Fetch and set firm members
+        let members: FirmMember[] = [];
+        try {
+          const membersRes = await fetch(`/api/firmMember?firmId=${firmDetails.$id}`);
+          members = await membersRes.json();
+        } catch (e) {
+          console.error("Failed to fetch firm members", e);
+        }
 
         set({
           currentFirm: firmDetails,
           userRole: member.role,
-          subscriptionStatus: subsStatus
+          subscriptionStatus: subsStatus,
+          firmMembers: members
         });
       } else {
         const subsStatus: SubscriptionStatus = {
@@ -155,7 +166,8 @@ const useFirmStore = create<FirmState>((set) => ({
         set({
           currentFirm: firmDetails,
           userRole: member.role,
-          subscriptionStatus: subsStatus
+          subscriptionStatus: subsStatus,
+          firmMembers: []
         });
       }
 

@@ -1,10 +1,10 @@
-import { AppwriteException } from "appwrite";
+import { FirebaseError } from "firebase/app";
 
-export const handleAppwriteError = (error: unknown, message: string) => {
-    if (error instanceof AppwriteException) {
-        console.error(`${message}: `, error.message);
-    } else {
-        console.error(`${message}: `, error);
+export const handleFirebaseError = (error: unknown, message: string) => {
+    if (error instanceof FirebaseError) {
+        console.error(`${message}: ${error.message}`);
+        throw error;
     }
-    return null;
+    console.error(`${message}: ${error}`);
+    throw error;
 };

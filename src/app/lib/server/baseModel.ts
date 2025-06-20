@@ -1,47 +1,29 @@
-import { databases } from "@/app/lib/server/node-appwrite";
-
-const databaseId = process.env.DATABASE_ID!;
+import { 
+    createDocument,
+    fetchDocuments,
+    getDocument,
+    updateDocument,
+    deleteDocument
+} from '@/app/lib/database';
 
 export const baseModel = (collectionId: string) => ({
     create: <T extends Record<string, unknown>>(data: T) => {
-        return databases.createDocument(
-            databaseId,
-            collectionId,
-            'unique()',
-            data
-        );
+        return createDocument(collectionId, data);
     },
 
     findMany: (queries = []) => {
-        return databases.listDocuments(
-            databaseId,
-            collectionId,
-            queries
-        );
+        return fetchDocuments(collectionId, queries);
     },
 
     findOne: (id: string) => {
-        return databases.getDocument(
-            databaseId,
-            collectionId,
-            id
-        );
+        return getDocument(collectionId, id);
     },
 
     update: <T extends Record<string, unknown>>(id: string, data: T) => {
-        return databases.updateDocument(
-            databaseId,
-            collectionId,
-            id,
-            data
-        );
+        return updateDocument(collectionId, id, data);
     },
 
     delete: (id: string) => {
-        return databases.deleteDocument(
-            databaseId,
-            collectionId,
-            id
-        );
+        return deleteDocument(collectionId, id);
     },
 });

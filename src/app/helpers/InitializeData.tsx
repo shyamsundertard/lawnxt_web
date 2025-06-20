@@ -1,68 +1,49 @@
 "use client";
 import { useEffect } from "react";
 import { useCaseStore, useFirmStore, useUserStore, useSubscriptionStore } from "@/store/useStore";
-import { handleAppwriteError } from "../../utils/handleError";
-
+import { handleFirebaseError } from "../../utils/handleError";
+import { fetchDocuments } from "@/app/lib/database";
 import { Case } from "../types";
 
-const InitializeData = () => {
+export default function InitializeData() {
   const { setCases } = useCaseStore();
-  const { setCurrentFirm, setUserRole, loadingFirmData, setFirmMembers } = useFirmStore(); 
+  const { currentFirm, loadingFirmData, firmMembers } = useFirmStore();
   const { user } = useUserStore();
-  const {fetchPlans}  = useSubscriptionStore();
+  const { fetchPlans } = useSubscriptionStore();
 
   useEffect(() => {
-    const loadFirmData = async () => {
-      if (!user) return;
+    const initializeData = async () => {
+      if (!user?.$id) return;
 
+      console.log("Initializing data", firmMembers);
+      
       try {
-        if (user.$id) {
-          const response = await fetch(`/api/getUserAndFirm?userId=${user.$id}`);
-          const { firm, member } = await response.json();
-
-          if (firm && member) {
-            const res = await fetch(`/api/firmMember?firmId=${firm.$id}`);
-    
-            const membs = await res.json();
-            
-            setCurrentFirm(firm);
-            setUserRole(member?.role || null);
-    
-            fetchCases(firm.$id);
-            loadingFirmData(user?.$id);
-            setFirmMembers(membs);
-          }
-          fetchPlans();
-  
-        }
-
+        await loadingFirmData(user.$id);
       } catch (error) {
-        console.error("Failed to fetch firm data: ", error);
+        handleFirebaseError(error, "Error loading firm data:");
       }
     };
 
-    if (user) {
-      loadFirmData();
-    }
-    
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, setCurrentFirm, setUserRole, setUserRole]);
+    initializeData();
+  }, [user?.$id, loadingFirmData]);
 
-  const fetchCases = async (firmId: string) => {
-    try {
-      const response = await fetch('/api/case');
-      const allCases = await response.json() as Case[]
-      const cases = allCases.filter(doc => {
-        return doc.firmId === firmId;
-      });
+  useEffect(() => {
+    const fetchCases = async () => {
+      if (!currentFirm?.$id) return;
       
-      setCases(cases);
-    } catch (error) {
-      handleAppwriteError(error, "Error fetching cases:");
+      try {
+        const cases = await fetchDocuments("cases", [`firmId == ${currentFirm.$id}`]) as Case[];
+        setCases(cases);
+      } catch (error) {
+        handleFirebaseError(error, "Error fetching cases:");
+      }
+    };
+
+    if (currentFirm?.$id) {
+      fetchCases();
+      fetchPlans();
     }
-  };
+  }, [currentFirm?.$id, setCases, fetchPlans]);
 
   return null;
-};
-
-export default InitializeData;
+}

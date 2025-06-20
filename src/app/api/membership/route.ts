@@ -5,8 +5,7 @@ const Membership = baseModel(process.env.MEMBERSHIP_COLLECTION_ID as string);
 
 export async function GET() {
     const plans = await Membership.findMany();
-
-    return NextResponse.json(plans.documents);
+    return NextResponse.json(plans);
 }
 
 // export async function POST(req: NextRequest) {

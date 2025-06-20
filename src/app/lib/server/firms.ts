@@ -31,24 +31,19 @@ export const createFirm = async (name: string, ownerId: string): Promise<FirmTyp
 
 export const getFirmByUserId = async (userId: string): Promise<FirmType | null> => {
     const result = await Firm.findMany();
-    if (result.total == 0) return null;
-    const firms = result.documents.filter(doc => doc.ownerId === userId);
-
-    return firms.length > 0 ? firms[0] as unknown as FirmType : null;
+    const firms = (result as unknown as FirmType[]).filter(doc => doc.ownerId === userId);
+    return firms.length > 0 ? firms[0] : null;
 };
 
 export const getFirmByInviteCode = async (inviteCode: string): Promise<FirmType> => {
     const res = await Firm.findMany();
-    const firm = res.documents.filter(doc => {
-        if (doc.inviteCode !== inviteCode) return false;
-        return true;
-    })
+    const firm = (res as unknown as FirmType[]).filter(doc => doc.inviteCode === inviteCode);
   
-  if (firm.length === 0) {
-    throw new Error("Firm not found");
-  }
+    if (firm.length === 0) {
+        throw new Error("Firm not found");
+    }
   
-  return firm[0] as unknown as FirmType;
+    return firm[0];
 };
 
 export const checkSubscriptionStatus = async (firmId: string): Promise<SubscriptionStatus> => {
@@ -111,7 +106,7 @@ export const checkFirmLimits = async (
 
     const result = await Fetch.findMany();
     
-    const filteredResults = result.documents.filter(doc => {
+    const filteredResults = (result as unknown as any[]).filter(doc => {
         if (doc.firmId !== firmId) return false;
         if (resourceType === 'member' && doc.status !== 'Approved') return false;
         return true;

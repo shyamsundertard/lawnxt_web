@@ -5,11 +5,12 @@ import Image from 'next/image';
 import Input from '../ui/forms/Input';
 import { useRouter } from 'next/navigation';
 import Button from '../ui/forms/Button';
-import { account, ID } from '../lib/client/appwrite';
 import toast from 'react-hot-toast';
-import { AppwriteException } from 'appwrite';
 import Link from 'next/link';
 import { CircleCheckBig, X } from 'lucide-react';
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { auth } from "@/app/lib/firebase";
 
 interface DataTypes {
     email: string;
@@ -57,28 +58,50 @@ const Register = () => {
             console.log("formData: ", formData);
             setLoading(true);
 
-            await account.create(ID.unique(), formData.email, formData.password, formData.name);
+            await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+            await updateProfile(auth.currentUser!, {
+                displayName: formData.name
+            });
 
             router.push("/login");
             toast.success("Registration successfull", {
                 icon: <CircleCheckBig/>
               });
-        } catch (error) {
-            console.error("account.create() or /api/user POST failed", error);
+        } catch (error: unknown) {
+            console.error("Firebase Auth Error:", error);
             
-            if (error instanceof AppwriteException) {
-                toast.error(error.message, {
-                    icon: <X/>
-                  });
-            } else if (error instanceof Error && 'isAxiosError' in error) {
-                const axiosError = error as { response?: { data?: { message?: string } } };
-                toast.error(axiosError.response?.data?.message || "API Error occurred", {
-                    icon: <X/>
-                  });
+            if (error instanceof FirebaseError) {
+                // Handle specific Firebase Auth error codes
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        toast.error("This email is already registered", {
+                            icon: <X/>
+                        });
+                        break;
+                    case 'auth/invalid-email':
+                        toast.error("Invalid email address", {
+                            icon: <X/>
+                        });
+                        break;
+                    case 'auth/operation-not-allowed':
+                        toast.error("Email/password accounts are not enabled", {
+                            icon: <X/>
+                        });
+                        break;
+                    case 'auth/weak-password':
+                        toast.error("Password is too weak", {
+                            icon: <X/>
+                        });
+                        break;
+                    default:
+                        toast.error(error.message, {
+                            icon: <X/>
+                        });
+                }
             } else {
                 toast.error("Something went wrong", {
                     icon: <X/>
-                  });
+                });
             }
             setFormData({ ...formData, password: ""});
             setConfirmPassword("");

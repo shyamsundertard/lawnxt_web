@@ -1,28 +1,38 @@
 // /app/api/verify-session/route.ts
 import { NextResponse } from "next/server";
-import * as sdk from "node-appwrite";
+import { getAuth } from "firebase-admin/auth";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
+
+// Initialize Firebase Admin if not already initialized
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
+}
 
 export async function GET(req: Request) {
-  const cookieHeader = req.headers.get("cookie");
-  const jwt = cookieHeader?.split("; ").find(c => c.startsWith("app_jwt="))?.split("=")[1];
+  const authHeader = req.headers.get("authorization");
+  const token = authHeader?.split("Bearer ")[1];
 
-  if (!jwt) {
+  if (!token) {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 
-  const client = new sdk.Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT!)
-    .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!)
-    .setJWT(jwt);
-
-  const account = new sdk.Account(client);
-
   try {
-    const user = await account.get();
-    console.log("Verify-session user ", user)
+    const decodedToken = await getAuth().verifyIdToken(token);
+    const user = {
+      $id: decodedToken.uid,
+      email: decodedToken.email,
+      name: decodedToken.name,
+    };
+    
     return NextResponse.json({ authenticated: true, user });
   } catch (e) {
-    console.error("JWT invalid", e);
+    console.error("Token invalid", e);
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 }

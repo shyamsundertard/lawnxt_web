@@ -6,7 +6,6 @@ import dayjs from "dayjs";
 import { ArrowLeft, CircleCheckBig, Download, Eye, Loader2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { fetchDocuments } from "@/app/lib/database";
-import { Query } from "appwrite";
 import { useCaseStore, useFirmStore } from "@/store/useStore";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import Loader from "../Loader";
@@ -214,9 +213,7 @@ const CasePage = ({ caseId }: { caseId?: string }) => {
     if (caseId) {
       try {
         setDriveLoading(true);
-        const result = await fetchDocuments(bucketId, [
-          Query.equal("caseId", caseId),
-        ]);
+        const result = await fetchDocuments(bucketId, [`caseId == ${caseId}`]);
         if (result.length > 0) {
           setFiles(result as unknown as File[]);
         } else {

@@ -1,40 +1,45 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAuthStore , useUserStore} from '@/store/useStore';
-import { account } from '@/app/lib/client/appwrite';
+import { useAuthStore, useUserStore } from '@/store/useStore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/app/lib/firebase';
 import LoadingSpinner from './LoadingSpinner';
 import { useRouter } from 'next/navigation';
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { setIsAuthenticated, setIsLoading, isLoading } = useAuthStore();
-  const {setUser} = useUserStore();
+  const { setUser } = useUserStore();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const currUser = await account.get();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log('User is authenticated');
         setIsAuthenticated(true);
         setUser({
-          $id: currUser.$id,
-          name: currUser.name,
-          email: currUser.email,
+          $id: user.uid,
+          name: user.displayName || '',
+          email: user.email || '',
         });
-      } catch (error) {
-        console.error({error: error})
+        // Set the session cookie
+        document.cookie = `current_session=${user.uid}; path=/; secure; samesite=strict`;
+      } else {
+        console.log('User is not authenticated');
         setIsAuthenticated(false);
+        // Clear the session cookie
+        document.cookie = 'current_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict';
         router.push('/login');
-      } finally {
-        setIsLoading(false);
       }
-    };
+      setIsLoading(false);
+    });
 
-    checkAuth();
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [setIsAuthenticated, setIsLoading, setUser, router]);
 
   if (isLoading) {
-    return<LoadingSpinner/>;
+    return <LoadingSpinner />;
   }
 
   return <>{children}</>;
