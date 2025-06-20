@@ -30,16 +30,16 @@ Use the credentials below to explore the dashboard instantly:
   - Owner must approve the membership request
 - **Dashboard Insights**
   - View total number of cases
-  - View number of today’s and tomorrow’s cases
+  - View number of today's and tomorrow's cases
   - Analytics of cases
 - **Secure Auth & State Management**
-  - Auth and database powered by **Appwrite**
+  - Auth and database powered by **Firebase**
   - Global state handled using **Zustand**
 
 ## 🧱 Tech Stack
 
 - **Frontend**: Next.js (App Router) with TypeScript
-- **Auth & Database**: Appwrite
+- **Auth & Database**: Firebase
 - **State Management**: Zustand
 - **Styling**: Tailwind CSS
 
