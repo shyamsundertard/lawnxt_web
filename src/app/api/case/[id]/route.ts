@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 const Case = baseModel(process.env.CASE_COLLECTION_ID as string);
 
 export async function GET(req: NextRequest, {params}: {params: {id: string}}) {
-        const user = await Case.findOne(params.id);
-        return NextResponse.json(user.documents);
+    const user = await Case.findOne(params.id);
+    return NextResponse.json(user);
 }
 
 export async function PUT(req: NextRequest, {params}: {params: {id: string}}) {

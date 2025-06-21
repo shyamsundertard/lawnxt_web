@@ -53,9 +53,6 @@ const Login = () => {
         formData.password
       );
 
-      // Get the ID token
-      const idToken = await userCredential.user.getIdToken();
-
       // Set user data
       setUser({
         $id: userCredential.user.uid,

@@ -1,18 +1,6 @@
 // /app/api/verify-session/route.ts
 import { NextResponse } from "next/server";
-import { getAuth } from "firebase-admin/auth";
-import { initializeApp, getApps, cert } from "firebase-admin/app";
-
-// Initialize Firebase Admin if not already initialized
-if (!getApps().length) {
-  initializeApp({
-    credential: cert({
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  });
-}
+import { adminAuth } from "@/app/lib/server/firebase-admin";
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -23,7 +11,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const decodedToken = await getAuth().verifyIdToken(token);
+    const decodedToken = await adminAuth.verifyIdToken(token);
     const user = {
       $id: decodedToken.uid,
       email: decodedToken.email,

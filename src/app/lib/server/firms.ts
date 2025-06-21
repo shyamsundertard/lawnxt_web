@@ -106,7 +106,7 @@ export const checkFirmLimits = async (
 
     const result = await Fetch.findMany();
     
-    const filteredResults = (result as unknown as any[]).filter(doc => {
+    const filteredResults = (result as unknown as { firmId: string; status?: string }[]).filter(doc => {
         if (doc.firmId !== firmId) return false;
         if (resourceType === 'member' && doc.status !== 'Approved') return false;
         return true;

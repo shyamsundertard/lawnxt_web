@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     const userId = decodedToken.uid;
 
     const result = await Firm.findMany();
-    const firmRes = (result as any[]).filter(doc => 
+    const firmRes = (result as unknown as { $id: string; ownerId: string }[]).filter(doc => 
         doc.$id === firmId &&
         doc.ownerId === userId
     );
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     }
 
     const memberRes = await FirmMember.findMany();
-    const filtered = (memberRes as any[]).filter(doc => 
+    const filtered = (memberRes as unknown as { firmId: string; userId: string; status: string; role: string }[]).filter(doc => 
         doc.firmId === firmId &&
         doc.userId === userId &&
         doc.status === 'Approved'

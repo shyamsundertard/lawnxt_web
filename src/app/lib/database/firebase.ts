@@ -10,7 +10,6 @@ import {
   where,
   orderBy,
   limit,
-  DocumentData,
   QueryConstraint
 } from 'firebase/firestore';
 import { db } from '../firebase';
