@@ -2,6 +2,8 @@ import { baseModel } from '@/app/lib/server/baseModel';
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 const Firm = baseModel(process.env.FIRM_COLLECTION_ID!);
 const FirmMember = baseModel(process.env.USER_COLLECTION_ID!);
 

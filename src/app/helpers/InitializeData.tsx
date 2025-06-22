@@ -25,7 +25,7 @@ export default function InitializeData() {
     };
 
     initializeData();
-  }, [user?.$id, loadingFirmData]);
+  }, [user?.$id, loadingFirmData, firmMembers]);
 
   useEffect(() => {
     const fetchCases = async () => {
